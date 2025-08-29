@@ -64,12 +64,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO updateUser(Long id, UserDTO userDTO) {
     log.info("[UserServiceImpl] updateUser called for id: {}", id);
-        User user = userRepository.findById(id).orElseThrow();
+    User user = userRepository.findById(id).orElseThrow();
     user.setUsername(userDTO.getUsername());
     user.setRole(userDTO.getRole());
     user.setFirstname(userDTO.getFirstname());
     user.setLastname(userDTO.getLastname());
-        User updated = userRepository.save(user);
+    if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+    }
+    User updated = userRepository.save(user);
     userDTO.setId(updated.getId());
     return userDTO;
     }
