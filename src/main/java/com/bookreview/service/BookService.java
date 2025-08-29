@@ -13,4 +13,7 @@ public interface BookService {
     Page<BookDTO> searchBooks(String keyword, org.springframework.data.domain.Pageable pageable);
     Page<BookDTO> getBooksPage(org.springframework.data.domain.Pageable pageable);
     void updateBookRating(Long bookId, Double avgRating, Integer reviewCount);
+
+    List<BookDTO> getTopRatedBooks(int limit);
+    List<BookDTO> getSimilarBooks(Long userId);
 }

@@ -4,6 +4,7 @@ import com.bookreview.dto.FavoriteBookDTO;
 import com.bookreview.service.FavoriteBookService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/favorites")

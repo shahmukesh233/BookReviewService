@@ -3,6 +3,7 @@ package com.bookreview.service.impl;
 import com.bookreview.dto.BookDTO;
 import com.bookreview.model.Book;
 import com.bookreview.repository.BookRepository;
+import com.bookreview.repository.FavoriteBookRepository;
 import com.bookreview.service.BookService;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -15,9 +16,57 @@ public class BookServiceImpl implements BookService {
 
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(BookServiceImpl.class);
     private final BookRepository bookRepository;
+    private final FavoriteBookRepository favoriteBookRepository;
 
-    public BookServiceImpl(BookRepository bookRepository) {
+    public BookServiceImpl(BookRepository bookRepository, FavoriteBookRepository favoriteBookRepository) {
         this.bookRepository = bookRepository;
+        this.favoriteBookRepository = favoriteBookRepository;
+    }
+    @Override
+    public List<BookDTO> getTopRatedBooks(int limit) {
+        log.info("[BookServiceImpl] getTopRatedBooks called, limit: {}", limit);
+        return bookRepository.findTop10ByAvgRatingIsNotNullOrderByAvgRatingDesc().stream()
+            .limit(limit)
+            .map(book -> {
+                BookDTO dto = new BookDTO();
+                dto.setId(book.getId());
+                dto.setTitle(book.getTitle());
+                dto.setAuthor(book.getAuthor());
+                dto.setDescription(book.getDescription());
+                dto.setCoverImage(book.getCoverImage());
+                dto.setGenres(book.getGenres());
+                dto.setPublishedYear(book.getPublishedYear());
+                dto.setAvgRating(book.getAvgRating());
+                dto.setReviewCount(book.getReviewCount());
+                return dto;
+            }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<BookDTO> getSimilarBooks(Long userId) {
+        log.info("[BookServiceImpl] getSimilarBooks called for userId: {}", userId);
+        List<String> favGenres = favoriteBookRepository.findByUser(com.bookreview.model.User.builder().id(userId).build())
+            .stream()
+            .map(fb -> fb.getBook().getGenres())
+            .distinct()
+            .collect(Collectors.toList());
+        List<com.bookreview.model.Book> similarBooks = favGenres.stream()
+            .flatMap(genre -> bookRepository.findByGenresContainingIgnoreCase(genre).stream())
+            .distinct()
+            .collect(Collectors.toList());
+        return similarBooks.stream().map(book -> {
+            BookDTO dto = new BookDTO();
+            dto.setId(book.getId());
+            dto.setTitle(book.getTitle());
+            dto.setAuthor(book.getAuthor());
+            dto.setDescription(book.getDescription());
+            dto.setCoverImage(book.getCoverImage());
+            dto.setGenres(book.getGenres());
+            dto.setPublishedYear(book.getPublishedYear());
+            dto.setAvgRating(book.getAvgRating());
+            dto.setReviewCount(book.getReviewCount());
+            return dto;
+        }).collect(Collectors.toList());
     }
 
     @Override

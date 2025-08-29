@@ -97,4 +97,16 @@ public class BookController {
         return authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     }
+
+    @GetMapping("/recommendations/top-rated")
+    public List<BookDTO> getTopRatedBooks(@RequestParam(defaultValue = "5") int limit) {
+        log.info("[BookController] getTopRatedBooks called, limit: {}", limit);
+        return bookService.getTopRatedBooks(limit);
+    }
+
+    @GetMapping("/recommendations/similar")
+    public List<BookDTO> getSimilarBooks(@RequestParam Long userId) {
+        log.info("[BookController] getSimilarBooks called for userId: {}", userId);
+        return bookService.getSimilarBooks(userId);
+    }
 }
