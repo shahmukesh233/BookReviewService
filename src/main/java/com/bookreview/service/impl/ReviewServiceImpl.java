@@ -37,6 +37,23 @@ public class ReviewServiceImpl implements ReviewService {
         this.userRepository = userRepository;
     }
 
+     @Override
+    public List<ReviewDTO> getAllReviews() {
+        log.info("[ReviewServiceImpl] getAllReviews called");
+        return reviewRepository.findAll().stream().map(r -> {
+            ReviewDTO dto = new ReviewDTO();
+            dto.setId(r.getId());
+            dto.setRating(r.getRating());
+            dto.setComment(r.getComment());
+            dto.setBookId(r.getBook().getId());
+            dto.setUserId(r.getUser().getId());
+            dto.setCreatedAt(r.getCreatedAt());
+            dto.setModifiedAt(r.getModifiedAt());
+            dto.setBookTitle(r.getBook().getTitle());
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
     @Override
     public ReviewDTO addReview(ReviewDTO reviewDTO) {
         log.info("[ReviewServiceImpl] addReview called for bookId: {}, userId: {}", reviewDTO.getBookId(), reviewDTO.getUserId());

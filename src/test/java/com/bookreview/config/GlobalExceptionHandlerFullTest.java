@@ -11,7 +11,9 @@ class GlobalExceptionHandlerFullTest {
 
     @Test
     void handleValidation_shouldReturnBadRequest() {
-        ResponseEntity<Map<String, Object>> response = handler.handleValidation(new org.springframework.web.bind.MethodArgumentNotValidException(null, null));
+        org.springframework.validation.BeanPropertyBindingResult bindingResult = new org.springframework.validation.BeanPropertyBindingResult(new Object(), "objectName");
+        org.springframework.web.bind.MethodArgumentNotValidException ex = new org.springframework.web.bind.MethodArgumentNotValidException(null, bindingResult);
+        ResponseEntity<Map<String, Object>> response = handler.handleValidation(ex);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 }

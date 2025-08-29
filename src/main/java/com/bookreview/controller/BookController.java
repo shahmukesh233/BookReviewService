@@ -5,6 +5,9 @@ import com.bookreview.service.BookService;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import com.bookreview.dto.BookDTO;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -22,22 +25,35 @@ public class BookController {
     }
 
     @PostMapping
-    public BookDTO createBook(@RequestBody BookDTO bookDTO) {
+    public ResponseEntity<?> createBook(@RequestBody BookDTO bookDTO, Authentication authentication) {
+        if (!hasAdminRole(authentication)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied: Only ADMIN can create books.");
+        }
         log.info("[BookController] createBook called with title: {}", bookDTO.getTitle());
-        return bookService.createBook(bookDTO);
+        return ResponseEntity.ok(bookService.createBook(bookDTO));
     }
+
 
     @PutMapping("/{id}")
-    public BookDTO updateBook(@PathVariable Long id, @RequestBody BookDTO bookDTO) {
+    public ResponseEntity<?> updateBook(@PathVariable Long id, @RequestBody BookDTO bookDTO, Authentication authentication) {
+        if (!hasAdminRole(authentication)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied: Only ADMIN can update books.");
+        }
         log.info("[BookController] updateBook called for id: {}", id);
-        return bookService.updateBook(id, bookDTO);
+        return ResponseEntity.ok(bookService.updateBook(id, bookDTO));
     }
 
+
     @DeleteMapping("/{id}")
-    public void deleteBook(@PathVariable Long id) {
+    public ResponseEntity<?> deleteBook(@PathVariable Long id, Authentication authentication) {
+        if (!hasAdminRole(authentication)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied: Only ADMIN can delete books.");
+        }
         log.info("[BookController] deleteBook called for id: {}", id);
         bookService.deleteBook(id);
+        return ResponseEntity.ok("Book deleted successfully.");
     }
+    
 
     @GetMapping("/{id}")
     public BookDTO getBookById(@PathVariable Long id) {
@@ -74,5 +90,11 @@ public class BookController {
     public void updateBookRating(@PathVariable Long bookId, @RequestBody BookDTO bookDTO) {
         log.info("[BookController] updateBookRating called for bookId: {}, avgRating: {}, reviewCount: {}", bookId, bookDTO.getAvgRating(), bookDTO.getReviewCount());
         bookService.updateBookRating(bookId, bookDTO.getAvgRating(), bookDTO.getReviewCount());
+    }
+
+    private boolean hasAdminRole(Authentication authentication) {
+        if (authentication == null || authentication.getAuthorities() == null) return false;
+        return authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     }
 }

@@ -31,7 +31,8 @@ class ReviewServiceImplFullTest {
 
     @Test
     void updateReview_shouldUpdateReview() {
-        Review review = Review.builder().id(1L).build();
+        Book book = Book.builder().id(2L).build();
+        Review review = Review.builder().id(1L).book(book).build();
         ReviewDTO dto = new ReviewDTO();
         when(reviewRepository.findById(1L)).thenReturn(Optional.of(review));
         when(reviewRepository.save(any(Review.class))).thenReturn(review);

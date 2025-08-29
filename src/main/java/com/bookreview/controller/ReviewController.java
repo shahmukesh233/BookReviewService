@@ -9,6 +9,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/reviews")
 public class ReviewController {
+
+    @GetMapping("/all")
+    public List<ReviewDTO> getAllReviews() {
+        log.info("[ReviewController] getAllReviews called");
+        return reviewService.getAllReviews();
+    }
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ReviewController.class);
     private final ReviewService reviewService;
 

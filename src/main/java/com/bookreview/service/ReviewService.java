@@ -10,4 +10,5 @@ public interface ReviewService {
     List<ReviewDTO> getReviewsByBookId(Long bookId);
     List<ReviewDTO> getReviewsByUserId(Long userId);
     double getAverageRatingForBook(Long bookId);
+    List<ReviewDTO> getAllReviews();
 }
