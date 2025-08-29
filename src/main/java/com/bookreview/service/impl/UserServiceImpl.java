@@ -83,9 +83,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO login(String username, String password) {
     log.info("[UserServiceImpl] login called for username: {}", username);
-        User user = userRepository.findAll().stream()
-                .filter(u -> u.getUsername().equals(username))
-                .findFirst().orElseThrow();
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new java.util.NoSuchElementException("User not found"));
         if (passwordEncoder.matches(password, user.getPassword())) {
             UserDTO dto = new UserDTO();
             dto.setId(user.getId());
@@ -95,6 +94,6 @@ public class UserServiceImpl implements UserService {
             dto.setLastname(user.getLastname());
             return dto;
         }
-        throw new RuntimeException("Invalid credentials");
+        throw new IllegalArgumentException("Invalid credentials");
     }
 }

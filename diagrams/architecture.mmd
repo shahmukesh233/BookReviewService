@@ -1,0 +1,25 @@
+%% Book Review Service - Architecture Diagram (Mermaid)
+graph TD
+  subgraph Client
+    UI[Web/SPA/REST Client]
+  end
+
+  subgraph Service["BookReviewService (Spring Boot)"]
+    SEC[Security Filter Chain]
+    CTRL[REST Controllers]
+    SVC[Application Services]
+    REPO[JPA Repositories]
+    CONF[Configuration]
+    API[OpenAPI / Swagger]
+  end
+
+  DB[(PostgreSQL)]
+
+  UI -->|HTTP/JSON + Bearer JWT| SEC
+  SEC --> CTRL
+  CTRL --> SVC
+  SVC --> REPO
+  REPO --> DB
+  CONF --> SEC
+  CONF --> API
+
